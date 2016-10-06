@@ -10,6 +10,8 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class Extractor implements Runnable {
 	private File sourceFile;
@@ -24,6 +26,7 @@ public class Extractor implements Runnable {
 
 	@Override
 	public void run() {
+		System.out.println("STARTING EXTRACTION WORKER FOR "+sourceFile.getName());
 		try {
 			HarcFile harcF = new HarcFile(sourceFile);
 			File scratchLocation = new File(scratchRoot, harcF.getFile()
@@ -72,37 +75,29 @@ public class Extractor implements Runnable {
 									&& !name.contains(".resource");
 						}
 					});
+			ExecutorService executor = Executors.newFixedThreadPool(4);
+			for (File asset : assetsFiles) {
 
-			for (int i = 0; i < assetsFiles.length; i++) {
-				File assets = assetsFiles[i];
-				AssetsFile assetsF = new AssetsFile(assets);
-				if (i % 10 == 0) {
-					System.out.println("converting " + i + "/"
-							+ assetsFiles.length + ":" + assets.getName());
-				}
-				List<File> extractedFiles;
-				try {
+				Runnable worker = new Converter(asset, outputLocation,
+						scratchLocation);
+				executor.execute(worker);
 
-					extractedFiles = assetsF.extractTo(scratchLocation);
-				} catch (FailedExtractionException e) {
-					System.err.println("Skipping: "
-							+ assetsF.getFile().getName());
-					continue;
-				}
-				for (File ddsFile : extractedFiles) {
-					ConvertDDS(ddsFile, outputLocation);
-				}
 			}
+			executor.shutdown();
+			while (!executor.isTerminated()) {
+
+			}
+			
 			for (File f : scratchLocation.listFiles()) {
 				f.deleteOnExit();
 			}
 		} catch (IOException e1) {
 			// TODO Auto-generated catch block
-			System.err.println("Failed to extract "+sourceFile.getName());
+			System.err.println("Failed to extract " + sourceFile.getName());
 			e1.printStackTrace();
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
-			System.err.println("Failed to extract "+sourceFile.getName());
+			System.err.println("Failed to extract " + sourceFile.getName());
 			e.printStackTrace();
 		}
 
@@ -114,29 +109,6 @@ public class Extractor implements Runnable {
 
 	private static BufferedReader getError(Process p) {
 		return new BufferedReader(new InputStreamReader(p.getErrorStream()));
-	}
-
-	private static void ConvertDDS(File dds, File targetDir)
-			throws InterruptedException, IOException {
-		if (targetDir.exists() && !targetDir.isDirectory()) {
-			throw new IllegalArgumentException("Target is not a directory!");
-		}
-		if (!targetDir.exists()) {
-			targetDir.mkdirs();
-		}
-		String ddsName = dds.getName();
-		int extIndex = ddsName.indexOf(".dds");
-		String targetName = ddsName + ".png";
-		if (extIndex != -1) {
-			targetName = ddsName.substring(0, extIndex) + ".png";
-		}
-		File targetFile = new File(targetDir, targetName);
-		ProcessBuilder pb2 = new ProcessBuilder(ImageExtractor.MAGICK_COMMAND, "convert",
-				"-flip", "\"" + dds.getAbsolutePath() + "\"", "\""
-						+ targetFile.getAbsolutePath() + "\"");
-		Process proc2 = pb2.start();
-		proc2.waitFor();
-
 	}
 
 }

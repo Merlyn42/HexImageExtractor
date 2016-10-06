@@ -10,6 +10,8 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class ImageExtractor implements Runnable {
 
@@ -49,17 +51,14 @@ public class ImageExtractor implements Runnable {
 				return name.endsWith(".harc");
 			}
 		});
-		Thread[] threads = new Thread[4];
-		for (File sourceFile : harcFiles) {
-			
-			for(int i=0;i<threads.length;i++){
-				if(threads[i]==null || !threads[i].isAlive()){
-					threads[i] = new Thread(new Extractor(sourceFile,scratchRoot,outputRoot));
-					threads[i].start();
-					break;
-				}
-			}
-			
+		ExecutorService executor = Executors.newFixedThreadPool(4);
+		for (File sourceFile : harcFiles) {			
+			Runnable worker = new Extractor(sourceFile,scratchRoot,outputRoot);
+			executor.execute(worker);			
+		}
+		executor.shutdown();
+		while(!executor.isTerminated()){
+		Thread.sleep(3000);
 		}
 		System.out.println("Complete");
 	}
