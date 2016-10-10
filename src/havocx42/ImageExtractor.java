@@ -21,13 +21,12 @@ public class ImageExtractor implements Runnable {
 	 */
 
 	public static final String UABE_COMMAND = "AssetBundleExtractor.exe";
-	public static final String UABE_PATH = "./tool/UABE/";
+	public static final String UABE_PATH = "tool/UABE/";
 	public static final String MAGICK_COMMAND = "./tool/magick/magick.exe";
 	public static final File SCRATCH = new File("scratch");
 	public static final File DEFAULT_OUTPUT = new File("images");
 
-	public static void main(String[] args)throws IOException,
-			InterruptedException {
+	public static void main(String[] args) throws IOException, InterruptedException {
 
 		// safety checks
 		File scratchRoot = SCRATCH;
@@ -43,7 +42,7 @@ public class ImageExtractor implements Runnable {
 			System.out.println("Provide Source Location");
 			return;
 		}
-		
+
 		File sourceLocation = new File(args[0]);
 		File[] harcFiles = sourceLocation.listFiles(new FilenameFilter() {
 			@Override
@@ -52,23 +51,21 @@ public class ImageExtractor implements Runnable {
 			}
 		});
 		ExecutorService executor = Executors.newFixedThreadPool(4);
-		for (File sourceFile : harcFiles) {			
-			Runnable worker = new Extractor(sourceFile,scratchRoot,outputRoot);
-			executor.execute(worker);			
+		for (File sourceFile : harcFiles) {
+			Runnable worker = new Extractor(sourceFile, scratchRoot, outputRoot);
+			executor.execute(worker);
 		}
 		executor.shutdown();
-		while(!executor.isTerminated()){
-		Thread.sleep(3000);
+		while (!executor.isTerminated()) {
+			Thread.sleep(3000);
 		}
 		System.out.println("Complete");
 	}
 
-
-
 	@Override
 	public void run() {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 }

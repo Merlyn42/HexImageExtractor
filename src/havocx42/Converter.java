@@ -21,10 +21,8 @@ public class Converter implements Runnable {
 
 	@Override
 	public void run() {
-		System.out.println("STARTING CONVERSION WORKER FOR "+assets.getName());
 		AssetsFile assetsF = new AssetsFile(assets);
 		List<File> extractedFiles;
-		System.out.println("Converting " + assets.getName());
 		try {
 			extractedFiles = assetsF.extractTo(scratchLocation);
 			for (File ddsFile : extractedFiles) {
@@ -43,8 +41,7 @@ public class Converter implements Runnable {
 
 	}
 
-	private static void ConvertDDS(File dds, File targetDir)
-			throws InterruptedException, IOException {
+	private static void ConvertDDS(File dds, File targetDir) throws InterruptedException, IOException {
 		if (targetDir.exists() && !targetDir.isDirectory()) {
 			throw new IllegalArgumentException("Target is not a directory!");
 		}
@@ -58,9 +55,8 @@ public class Converter implements Runnable {
 			targetName = ddsName.substring(0, extIndex) + ".png";
 		}
 		File targetFile = new File(targetDir, targetName);
-		ProcessBuilder pb2 = new ProcessBuilder(ImageExtractor.MAGICK_COMMAND,
-				"convert", "-flip", "\"" + dds.getAbsolutePath() + "\"", "\""
-						+ targetFile.getAbsolutePath() + "\"");
+		ProcessBuilder pb2 = new ProcessBuilder(ImageExtractor.MAGICK_COMMAND, "convert", "-flip", "\"" + dds.getAbsolutePath() + "\"",
+				"\"" + targetFile.getAbsolutePath() + "\"");
 		Process proc2 = pb2.start();
 		proc2.waitFor();
 

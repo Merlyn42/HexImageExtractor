@@ -37,6 +37,7 @@ public class AssetsFile {
 		RandomAccessFile sourceF = new RandomAccessFile(file, "r");
 		data = new byte[(int) sourceF.length()];
 		sourceF.readFully(data);
+		sourceF.close();
 
 		ArrayList<File> extractedFiles = new ArrayList<File>();
 		// discovery

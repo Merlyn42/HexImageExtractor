@@ -43,8 +43,7 @@ public class BinaryUtil {
 		return -1;
 	}
 
-	public static long findOffset(ByteArrayInputStreamWI data, byte[] pattern)
-			throws IOException {
+	public static long findOffset(ByteArrayInputStreamWI data, byte[] pattern) throws IOException {
 		long curPos = 0;
 		while (true) {
 			int byteRead;
@@ -85,13 +84,11 @@ public class BinaryUtil {
 	}
 
 	public static int readIntLE(InputStream is) throws IOException {
-		return is.read() + is.read() * 0x100 + is.read() * 0x100 * 0x100
-				+ is.read() * 0x100 * 0x100 * 0x100;
+		return is.read() + is.read() * 0x100 + is.read() * 0x100 * 0x100 + is.read() * 0x100 * 0x100 * 0x100;
 
 	}
 
-	public static void writeIntLE(OutputStream os, int value)
-			throws IOException {
+	public static void writeIntLE(OutputStream os, int value) throws IOException {
 		ByteArrayOutputStream bos = new ByteArrayOutputStream();
 		DataOutputStream dout = new DataOutputStream(bos);
 		dout.writeInt(value);

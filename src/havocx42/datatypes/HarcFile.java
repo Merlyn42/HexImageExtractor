@@ -66,7 +66,7 @@ public class HarcFile {
 
 	}
 
-	public List<File> extractTo(File target) throws IOException {
+	public List<File> expandTo(File target) throws IOException {
 		if (target.exists() && !target.isDirectory()) {
 			throw new IllegalArgumentException("Target is not a directory!");
 		}

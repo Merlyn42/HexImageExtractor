@@ -1,4 +1,5 @@
 package havocx42.datatypes;
+
 public class FileMetaData {
 	String name;
 	public int offset;
